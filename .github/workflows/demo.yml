@@ -1,0 +1,72 @@
+name: Deploy website
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint code
+        run: npm run lint
+      - name: Test code
+        run: npm run test
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Build website
+        run: npm run build
+      - name: upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: |
+            dist
+            package.json
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deploying..."
+# name: Events Demo 1
+# on:
+#   pull_request:
+#     types: opened
+#     branches:
+#       - main
+#       - "dev-*" #dev-new dev-sds ...etc
+#       - "feat/**" # feat/new feat/new/what
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
+#       - "dev-*" #dev-new dev-sds ...etc
+#       - "feat/**" # feat/new feat/new/what
+#     paths-ignore:
+#       - ".github/workflows/*"
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Output event data
+# run: echo "${{ toJSON(github.event) }}"
+#       - name: Get code
+#         uses: actions/checkout@v3
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Test code
+#         run: npm run test
+#       - name: Build code
+#         run: npm run build
+#       - name: Deploy project
+#         run: echo "Deploying..."
